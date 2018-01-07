@@ -55,3 +55,16 @@ module.exports.checkIfMultipartFormDataRequest = (req) => {
   });
 
 };
+
+module.exports.isJSON = (object) => {
+  try {
+    const parsedObject = JSON.parse(object);
+    return true;
+  } catch (e) {
+    if (typeof object === 'object' && object.constructor === Object && typeof object.constructor === 'function') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};

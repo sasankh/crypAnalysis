@@ -25,6 +25,14 @@ exports.credentials = {
 };
 
 exports.apis = {
+  coin_market_cap: {
+    base_url: 'https://coinmarketcap.com',
+    api: {
+      all_crypto: '/all/views/all/',
+      all_coin: '/coins/views/all/',
+      all_token: '/tokens/views/all/'
+    }
+  }
 };
 
 exports.log = {

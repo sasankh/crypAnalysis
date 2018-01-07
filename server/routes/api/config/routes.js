@@ -5,7 +5,8 @@ const ROUTES = {
   //POST
 
   //GET
-  home: '/'
+  home: '/',
+  updateCryptoList: '/crypto/update/:type'
 
   //PUT
 
