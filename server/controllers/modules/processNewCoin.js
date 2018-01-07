@@ -9,13 +9,13 @@ const {
   utilMysql
 } = require(__base + '/server/utilities/utils');
 
-module.exports.processNewCryptoHandler = (req) => {
+module.exports.processNewCoinHandler = (req) => {
   return new Promise((resolve, reject) => {
 
     const fid = {
       requestId: req.requestId,
       handler: req.passData.handler,
-      functionName: 'processNewCryptoHandler'
+      functionName: 'processNewCoinHandler'
     };
 
     logger.debug(fid,'invoked');

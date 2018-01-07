@@ -13,7 +13,7 @@ const {
 } = require(__base + '/server/utilities/utils');
 
 const websiteScrape = require(__base + '/server/controllers/utilities/websiteScrape');
-const processNewCrypto = require(__base + '/server/controllers/modules/processNewCrypto');
+const processNewCoin = require(__base + '/server/controllers/modules/processNewCoin');
 
 module.exports = (req, res) => {
   logger.request('updateCryptoList',req);
@@ -208,7 +208,7 @@ function processDesiredTable(req) {
         const returnBody = {};
         returnBody[crypto.Symbol] = false;
 
-        processNewCrypto.processNewCryptoHandler(miniReq)
+        processNewCoin.processNewCoinHandler(miniReq)
         .then((data) => {
           added++;
           returnBody[crypto.Symbol] = true;
