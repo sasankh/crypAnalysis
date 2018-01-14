@@ -9,6 +9,10 @@ const {
   utilMysql
 } = require(__base + '/server/utilities/utils');
 
+const {
+  cryptoNameErrorChecker
+} = require(`${__base}/server/controllers/utilities/findErrorHelpers`);
+
 module.exports.processNewCoinHandler = (req) => {
   return new Promise((resolve, reject) => {
 
@@ -80,8 +84,6 @@ function addCoinToDbIfNew(req) {
 
     logger.debug(fid,'invoked');
 
-    // Assuming Symbol is not a primary key. Thus, checking if exist before adding record.
-    // Not performing check and insert in once query. Personal choice
     const checkIfExistQuery = {
       query: 'SELECT * FROM crypto_info WHERE symbol = ? LIMIT 1',
       post:[
@@ -90,11 +92,12 @@ function addCoinToDbIfNew(req) {
     };
 
     const insertQuery = {
-      query: 'INSERT INTO crypto_info (symbol, name, type) VALUES (?, ?, ?)',
+      query: 'INSERT INTO crypto_info (symbol, name, type, attention) VALUES (?, ?, ?, ?)',
       post: [
         req.passData.payload.symbol,
         req.passData.payload.name,
-        req.passData.payload.type
+        req.passData.payload.type,
+        (cryptoNameErrorChecker(req, req.passData.payload.symbol, req.passData.payload.name) ? 1 : 0)
       ]
     };
 
