@@ -12,6 +12,8 @@ const {
   utilMysql
 } = require(__base + '/server/utilities/utils');
 
+const configCoinMarketCap = require(`${__base}/server/controllers/handlers/coinMarketCap/config`);
+
 const websiteScrape = require(__base + '/server/controllers/utilities/websiteScrape');
 const processNewCoin = require(__base + '/server/controllers/modules/processNewCoin');
 const processNewToken = require(__base + '/server/controllers/modules/processNewToken');
@@ -117,33 +119,11 @@ function identifyDesiredTables(req) {
 
     switch (req.passData.type) {
       case 'coins':
-        requiredAttributes = [
-          '#',
-          'Name',
-          'Symbol',
-          'Market Cap',
-          'Price',
-          'Circulating Supply',
-          'Volume (24h)',
-          '% 1h',
-          '% 24h',
-          '% 7d'
-        ];
+        requiredAttributes = configCoinMarketCap.requiredHeaders.coins;
         break;
 
       case 'tokens':
-        requiredAttributes = [
-          '#',
-          'Name',
-          'Platform',
-          'Market Cap',
-          'Price',
-          'Circulating Supply',
-          'Volume (24h)',
-          '% 1h',
-          '% 24h',
-          '% 7d'
-        ];
+        requiredAttributes = configCoinMarketCap.requiredHeaders.tokens;
         break;
     }
 
@@ -202,22 +182,23 @@ function processDesiredTable(req) {
       let notAddedList = {};
 
       async.mapLimit(cryptTable, 5, (crypto, callback2) => {
+        const cryptoName = crypto[configCoinMarketCap.correspondingAttribute.Name].trim();
 
         let miniReq = {};
         let cryptoSymbol = "TO BE DETERMINED";
-        const splitName = crypto.Name.split("\n");
+        const splitName = cryptoName.split("\n");
         let handlerFunction = 'NEED TO BE DETERMINED';
 
         switch (req.passData.type) {
           case 'coins':
-            cryptoSymbol = crypto.Symbol.trim();
+            cryptoSymbol = crypto[configCoinMarketCap.correspondingAttribute.Symbol].trim();
             miniReq = {
               requestId: `${req.requestId}-${cryptoSymbol}`,
               passData: {
                 handler: req.passData.handler,
                 payload: {
                   symbol: cryptoSymbol,
-                  name: (splitName.length === 2 ? splitName[1].trim() : crypto.Name.trim()),
+                  name: (splitName.length === 2 ? splitName[1].trim() : cryptoName),
                   type: req.passData.type
                 }
               }
@@ -226,16 +207,16 @@ function processDesiredTable(req) {
           break;
 
           case 'tokens':
-            cryptoSymbol = (splitName.length === 2 ? splitName[0].trim() : crypto.Name.trim()),
+            cryptoSymbol = (splitName.length === 2 ? splitName[0].trim() : cryptoName),
             miniReq = {
               requestId: `${req.requestId}-${cryptoSymbol}`,
               passData: {
                 handler: req.passData.handler,
                 payload: {
                   symbol: cryptoSymbol,
-                  name: (splitName.length === 2 ? splitName[1].trim() : crypto.Name.trim()),
+                  name: (splitName.length === 2 ? splitName[1].trim() : cryptoName),
                   type: req.passData.type,
-                  platform: crypto.Platform.trim()
+                  platform: crypto[configCoinMarketCap.correspondingAttribute.Platform].trim()
                 }
               }
             };
