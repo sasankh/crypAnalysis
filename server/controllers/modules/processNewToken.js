@@ -9,19 +9,19 @@ const {
   utilMysql
 } = require(__base + '/server/utilities/utils');
 
-module.exports.processNewCoinHandler = (req) => {
+module.exports.processNewTokenHandler = (req) => {
   return new Promise((resolve, reject) => {
 
     const fid = {
       requestId: req.requestId,
       handler: req.passData.handler,
-      functionName: 'processNewCoinHandler'
+      functionName: 'processNewTokenHandler'
     };
 
     logger.debug(fid,'invoked');
 
     validateRequiredAttributes(req)
-    .then(addCoinToDbIfNew)
+    .then(addTokenToDbIfNew)
     .then(responseBody)
     .then((data) => {
       resolve(data);
@@ -45,7 +45,8 @@ function validateRequiredAttributes(req) {
     const requiredAttributes = [
       'name',
       'symbol',
-      'type'
+      'type',
+      'platform'
     ];
 
     const payloadAttributes = Object.keys(req.passData.payload);
@@ -70,12 +71,12 @@ function validateRequiredAttributes(req) {
   });
 }
 
-function addCoinToDbIfNew(req) {
+function addTokenToDbIfNew(req) {
   return new Promise((resolve, reject) => {
     const fid = {
       requestId: req.requestId,
       handler: req.passData.handler,
-      functionName: 'addCoinToDbIfNew'
+      functionName: 'addTokenToDbIfNew'
     };
 
     logger.debug(fid,'invoked');
@@ -90,11 +91,12 @@ function addCoinToDbIfNew(req) {
     };
 
     const insertQuery = {
-      query: 'INSERT INTO crypto_info (symbol, name, type) VALUES (?, ?, ?)',
+      query: 'INSERT INTO crypto_info (symbol, name, type, platform) VALUES (?, ?, ?, ?)',
       post: [
         req.passData.payload.symbol,
         req.passData.payload.name,
-        req.passData.payload.type
+        req.passData.payload.type,
+        req.passData.payload.platform
       ]
     };
 
@@ -103,7 +105,7 @@ function addCoinToDbIfNew(req) {
         reject({error: { code: 102, message: err, fid: fid, type: 'warn', trace: null, defaultMessage:false } });
       } else {
         if (result.length > 0) {
-          reject({error: { code: 103, message: `Coin already exist in the system ${req.passData.payload.symbol}`, fid: fid, type: 'debug', trace: null, defaultMessage:false } });
+          reject({error: { code: 103, message: `Token already exist in the system ${req.passData.payload.symbol}`, fid: fid, type: 'debug', trace: null, defaultMessage:false } });
         } else {
 
           utilMysql.queryMysql(req, 'db_crypto', insertQuery.query, insertQuery.post, (err, result) => {

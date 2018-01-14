@@ -1,4 +1,6 @@
 module.exports = {
   home: require(`${__base}/server/controllers/handlers/home`),
-  updateCryptoList: require(`${__base}/server/controllers/handlers/updateCryptoList`)
+
+  //coinMarketCap
+  coinMarketCap_UpdateCryptoList: require(`${__base}/server/controllers/handlers/coinMarketCap/updateCryptoList`)
 };

@@ -6,7 +6,7 @@ const ROUTES = {
 
   //GET
   home: '/',
-  updateCryptoList: '/crypto/update/:type'
+  coinMarketCap_UpdateCryptoList: '/crypto/coin_market_cap/update/:type'
 
   //PUT
 

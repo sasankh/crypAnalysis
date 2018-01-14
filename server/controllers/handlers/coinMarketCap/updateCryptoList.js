@@ -14,6 +14,7 @@ const {
 
 const websiteScrape = require(__base + '/server/controllers/utilities/websiteScrape');
 const processNewCoin = require(__base + '/server/controllers/modules/processNewCoin');
+const processNewToken = require(__base + '/server/controllers/modules/processNewToken');
 
 module.exports = (req, res) => {
   logger.request('updateCryptoList',req);
@@ -93,10 +94,9 @@ function getCryptoTable(req) {
       } else {
         if (result.length > 0) {
           req.passData.cryptTable = result;
-
           resolve(req);
         } else {
-          reject({error: { code: 105, message: "There is no table that could be retrieved", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
+          reject({error: { code: 102, message: "There is no table that could be retrieved", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
         }
       }
     });
@@ -113,33 +113,43 @@ function identifyDesiredTables(req) {
 
     logger.debug(fid,'invoked');
 
-    const requiredAttributes = [
-      '#',
-      'Name',
-      'Symbol',
-      'Market Cap',
-      'Price',
-      'Circulating Supply',
-      'Volume (24h)',
-      '% 1h',
-      '% 24h',
-      '% 7d'
-    ];
+    let requiredAttributes = [];
 
-//for token
-    // [ '#',//
-    //   'Name',//
-    //   'Platform',
-    //   'Market Cap',//
-    //   'Price',//
-    //   'Circulating Supply',//
-    //   'Volume (24h)',//
-    //   '% 1h',//
-    //   '% 24h',//
-    //   '% 7d' ]//
+    switch (req.passData.type) {
+      case 'coins':
+        requiredAttributes = [
+          '#',
+          'Name',
+          'Symbol',
+          'Market Cap',
+          'Price',
+          'Circulating Supply',
+          'Volume (24h)',
+          '% 1h',
+          '% 24h',
+          '% 7d'
+        ];
+        break;
+
+      case 'tokens':
+        requiredAttributes = [
+          '#',
+          'Name',
+          'Platform',
+          'Market Cap',
+          'Price',
+          'Circulating Supply',
+          'Volume (24h)',
+          '% 1h',
+          '% 24h',
+          '% 7d'
+        ];
+        break;
+    }
 
     const checkIfArrayAttributeCorrect = (crypto) => {
       const attributeKeys = Object.keys(crypto);
+      logger.debug(fid, "Attribute Keys: ", attributeKeys);
 
       const result = requiredAttributes.map((attribute) => {
         if (attributeKeys.indexOf(attribute) > -1) {
@@ -170,7 +180,7 @@ function identifyDesiredTables(req) {
         req.passData.desiredTables = desiredTables;
         resolve(req);
       } else {
-        reject({error: { code: 105, message: "There is no table with all the required headers", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
+        reject({error: { code: 104, message: "There is no table with all the required headers", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
       }
     });
 
@@ -188,44 +198,84 @@ function processDesiredTable(req) {
     logger.debug(fid,'invoked');
 
     async.mapLimit(req.passData.desiredTables, 5, (cryptTable, callback) => {
-      let added = 0;
-      let notAdded = 0;
-      async.mapLimit(cryptTable, 5, (crypto, callback2) => {
-        const splitData = crypto.Name.split("\n");
+      let addedList = {};
+      let notAddedList = {};
 
-        const miniReq = {
-          requestId: `${req.requestId}-${crypto.Symbol}`,
-          passData: {
-            handler: req.passData.handler,
-            payload: {
-              symbol: crypto.Symbol,
-              name: (splitData.length === 2 ? splitData[1].trim() : 'NEED_ATTENTION'),
-              type: req.passData.type,
-            }
-          }
+      async.mapLimit(cryptTable, 5, (crypto, callback2) => {
+
+        let miniReq = {};
+        let cryptoSymbol = "TO BE DETERMINED";
+        const splitName = crypto.Name.split("\n");
+        let handlerFunction = 'NEED TO BE DETERMINED';
+
+        switch (req.passData.type) {
+          case 'coins':
+            cryptoSymbol = crypto.Symbol.trim();
+            miniReq = {
+              requestId: `${req.requestId}-${cryptoSymbol}`,
+              passData: {
+                handler: req.passData.handler,
+                payload: {
+                  symbol: cryptoSymbol,
+                  name: (splitName.length === 2 ? splitName[1].trim() : crypto.Name.trim()),
+                  type: req.passData.type
+                }
+              }
+            };
+            handlerFunction = processNewCoin.processNewCoinHandler;
+          break;
+
+          case 'tokens':
+            cryptoSymbol = (splitName.length === 2 ? splitName[0].trim() : crypto.Name.trim()),
+            miniReq = {
+              requestId: `${req.requestId}-${cryptoSymbol}`,
+              passData: {
+                handler: req.passData.handler,
+                payload: {
+                  symbol: cryptoSymbol,
+                  name: (splitName.length === 2 ? splitName[1].trim() : crypto.Name.trim()),
+                  type: req.passData.type,
+                  platform: crypto.Platform.trim()
+                }
+              }
+            };
+            handlerFunction = processNewToken.processNewTokenHandler;
+            break;
+        }
+
+        const returnBody = {
+          symbol: cryptoSymbol,
+          name: miniReq.passData.payload.name,
+          added: false,
+          message: 'UNKNOWN'
         };
 
-        const returnBody = {};
-        returnBody[crypto.Symbol] = false;
-
-        processNewCoin.processNewCoinHandler(miniReq)
+        handlerFunction(miniReq)
         .then((data) => {
-          added++;
-          returnBody[crypto.Symbol] = true;
-          callback2(null, returnBody);
+          returnBody.added = true;
+          returnBody.message = "Successfully Added";
+          addedList[cryptoSymbol] = returnBody;
+          callback2(null, true);
         })
         .catch((err) => {
           logger.log_reject(miniReq, err);
-          notAdded++;
-          callback2(null, returnBody);
+          returnBody.message = (err && err.error && err.error.message ? err.error.message : 'UNKNOWN');
+          notAddedList[cryptoSymbol] = returnBody;
+          callback2(null, false);
         });
 
       }, (err, result2) => {
+        const total_crypto = cryptTable.length;
+        const total_added = Object.keys(addedList).length;
+        const total_not_added = Object.keys(notAddedList).length;
+        const unknown_status_count = total_crypto - total_added - total_not_added;
         callback(null, {
-          total_crypto: cryptTable.length,
-          result: result2,
-          total_added: added,
-          not_added: notAdded
+          total_crypto,
+          unknown_status_count,
+          total_added,
+          total_not_added,
+          added_list_json: addedList,
+          not_added_list_json: notAddedList
         });
       });
 
@@ -249,7 +299,7 @@ function responseBody(req) {
 
     const responseBody = {
       total_tables: req.passData.desiredTables.length,
-      results_array: req.passData.desiredTablesResult
+      tables_results_array: req.passData.desiredTablesResult
     };
 
     resolve(responseBody);

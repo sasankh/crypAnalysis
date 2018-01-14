@@ -5,12 +5,12 @@ exports.app = {
   environment: process.env.ENVIRONMENT,
   port: process.env.PORT,
   cryptoKey: process.env.CRYPTOKEY,
-  timeout: process.env.REQUEST_TIMEOUT || 60000,
+  timeout: process.env.REQUEST_TIMEOUT || 300000, //five minutes
   downloadPath :global.__base+'/server/downloads/'
 };
 
 exports.mysql = {
-  query_timeout: process.env.QUERY_TIMEOUT || 300000,
+  query_timeout: process.env.QUERY_TIMEOUT || 300000,  //five minutes
   db_crypto: {
     host: process.env.CRYPTO_MYSQL_HOST,
     user: process.env.CRYPTO_MYSQL_USER,
