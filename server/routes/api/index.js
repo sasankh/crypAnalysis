@@ -18,6 +18,7 @@ exports = module.exports = (app) => {
   app.get(apiRoutes.coinMarketCap_UpdateCryptoList, controller.coinMarketCap_UpdateCryptoList);
 
   //PUT
+  app.put(apiRoutes.updateCryptoInfo, controller.local_UpdateCryptoInfo);
 
   //DEL
 
