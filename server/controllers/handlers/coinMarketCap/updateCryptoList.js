@@ -178,8 +178,8 @@ function processDesiredTable(req) {
     logger.debug(fid,'invoked');
 
     async.mapLimit(req.passData.desiredTables, 5, (cryptTable, callback) => {
-      let addedList = {};
-      let notAddedList = {};
+      let addedList = [];
+      let addErrorList = [];
 
       async.mapLimit(cryptTable, 5, (crypto, callback2) => {
         const cryptoName = crypto[configCoinMarketCap.correspondingAttribute.Name].trim();
@@ -235,28 +235,28 @@ function processDesiredTable(req) {
         .then((data) => {
           returnBody.added = true;
           returnBody.message = "Successfully Added";
-          addedList[cryptoSymbol] = returnBody;
-          callback2(null, true);
+          addedList.push(cryptoSymbol);
+          callback2(null, returnBody);
         })
         .catch((err) => {
           logger.log_reject(miniReq, err);
           returnBody.message = (err && err.error && err.error.message ? err.error.message : 'UNKNOWN');
-          notAddedList[cryptoSymbol] = returnBody;
-          callback2(null, false);
+          addErrorList.push(returnBody);
+          callback2(null, returnBody);
         });
 
       }, (err, result2) => {
         const total_crypto = cryptTable.length;
-        const total_added = Object.keys(addedList).length;
-        const total_not_added = Object.keys(notAddedList).length;
-        const unknown_status_count = total_crypto - total_added - total_not_added;
+        const total_added = addedList.length;
+        const total_add_error = addErrorList.length;
+        const unknown_status_count = total_crypto - total_added - total_add_error;
+
         callback(null, {
           total_crypto,
-          unknown_status_count,
           total_added,
-          total_not_added,
-          added_list_json: addedList,
-          not_added_list_json: notAddedList
+          total_add_error,
+          unknown_status_count,
+          error_adding_list: addErrorList
         });
       });
 
