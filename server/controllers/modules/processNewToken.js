@@ -87,19 +87,21 @@ function addTokenToDbIfNew(req) {
 
     logger.debug(fid,'invoked');
 
+    const uuidNameSpace = uuidv5(`${req.passData.payload.symbol}-${req.passData.payload.name}-${req.passData.payload.type}-${req.passData.payload.platform}`, uuidv5.URL);
+    const crypto_id = uuidv5(req.passData.payload.symbol, uuidNameSpace);
+
     const checkIfExistQuery = {
-      query: 'SELECT * FROM crypto_info WHERE symbol = ? LIMIT 1',
+      query: 'SELECT * FROM crypto_info WHERE symbol = ? AND crypto_id = ? LIMIT 1',
       post:[
-        req.passData.payload.symbol
+        req.passData.payload.symbol,
+        crypto_id
       ]
     };
 
-    const uuidNameSpace = uuidv5(`${req.passData.payload.symbol}-${req.passData.payload.name}-${req.passData.payload.type}`, uuidv5.URL);
-
     const insertQuery = {
-      query: 'INSERT INTO crypto_info (symbol, name, type, platform, attention) VALUES (?, ?, ?, ?, ?, ?)',
+      query: 'INSERT INTO crypto_info (crypto_id, symbol, name, type, platform, attention) VALUES (?, ?, ?, ?, ?, ?)',
       post: [
-        uuidv5(req.passData.payload.symbol, uuidNameSpace),
+        crypto_id,
         req.passData.payload.symbol,
         req.passData.payload.name,
         req.passData.payload.type,
