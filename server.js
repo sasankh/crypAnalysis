@@ -41,7 +41,7 @@ app.use(requestID); // request id for logger
 app.use(helmet()); // implements 6 measures for security headers
 app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
 
-app.set('trust proxy', 1);
+//app.set('trust proxy', 1);
 
 // routes
 require('./server/routes/index')(app);
@@ -57,6 +57,6 @@ const server = app.listen(app.get('port'), () => {
    logger.info(`[INITIALIZATION]: server.js --> Server started at port: ${app.get('port')}`);
 });
 
-server.timeout = config.app.timeout;
+server.timeout = parseInt(config.app.timeout);
 
 module.exports = server;

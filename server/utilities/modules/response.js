@@ -125,7 +125,11 @@ module.exports.failure = (request, body, response) => {
       functionName: 'Exception'
     };
 
-    const new_body = { error: { code: 102, message: 'Problem processing', fid: fid, type: 'error', trace: body }};
+    const new_body = { error: { code: 102, message: 'Problem processing', fid: fid, type: 'error', trace: {
+      body,
+      message: body.message,
+      stack: body.stack
+    }}};
 
     logger.log_manager(new_body.error);
     process(request, response, new_body, caughtError);

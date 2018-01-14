@@ -5,7 +5,8 @@ const ROUTES = {
   //POST
 
   //GET
-  home: '/'
+  home: '/',
+  coinMarketCap_UpdateCryptoList: '/crypto/coin_market_cap/update/:type'
 
   //PUT
 
