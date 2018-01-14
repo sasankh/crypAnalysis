@@ -1,0 +1,40 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema crypto
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema crypto
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `crypto` DEFAULT CHARACTER SET latin1 ;
+USE `crypto` ;
+
+-- -----------------------------------------------------
+-- Table `crypto`.`crypto_info`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `crypto`.`crypto_info` (
+  `symbol` VARCHAR(45) NOT NULL COMMENT 'The symbol of the respective crypto coin',
+  `name` VARCHAR(45) NOT NULL COMMENT 'Name of the crypto',
+  `description` BLOB NULL DEFAULT NULL COMMENT 'Description of the crypto coin or token',
+  `url` VARCHAR(256) NULL DEFAULT NULL COMMENT 'Url to the home page',
+  `type` VARCHAR(45) NOT NULL COMMENT 'Coin or Token',
+  `attention` TINYINT(4) NULL DEFAULT NULL,
+  `platform` VARCHAR(45) NULL DEFAULT NULL,
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'local db id. Auto increment',
+  PRIMARY KEY (`ID`),
+  UNIQUE INDEX `ID_UNIQUE` (`ID` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
