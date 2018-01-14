@@ -33,6 +33,7 @@
     "mysql": "^2.15.0",
     "request": "^2.83.0",
     "tabletojson": "^0.6.0",
+    "uuid": "^3.1.0",
     "validator": "^9.2.0"
   },
   "devDependencies": {

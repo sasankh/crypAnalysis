@@ -1,6 +1,8 @@
 'use strict';
 
 const async = require("async");
+const uuidv5 = require('uuid/v5');
+
 const config = require(__base + '/server/config/config');
 const {
   logger,
@@ -91,9 +93,12 @@ function addCoinToDbIfNew(req) {
       ]
     };
 
+    const uuidNameSpace = uuidv5(`${req.passData.payload.symbol}-${req.passData.payload.name}-${req.passData.payload.type}`, uuidv5.URL);
+
     const insertQuery = {
-      query: 'INSERT INTO crypto_info (symbol, name, type, attention) VALUES (?, ?, ?, ?)',
+      query: 'INSERT INTO crypto_info (crypto_id, symbol, name, type, attention) VALUES (?, ?, ?, ?, ?)',
       post: [
+        uuidv5(req.passData.payload.symbol, uuidNameSpace),
         req.passData.payload.symbol,
         req.passData.payload.name,
         req.passData.payload.type,
