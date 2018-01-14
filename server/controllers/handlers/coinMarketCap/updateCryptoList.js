@@ -199,7 +199,8 @@ function processDesiredTable(req) {
                 payload: {
                   symbol: cryptoSymbol,
                   name: (splitName.length === 2 ? splitName[1].trim() : cryptoName),
-                  type: req.passData.type
+                  type: req.passData.type,
+                  source: configCoinMarketCap.source
                 }
               }
             };
@@ -216,7 +217,8 @@ function processDesiredTable(req) {
                   symbol: cryptoSymbol,
                   name: (splitName.length === 2 ? splitName[1].trim() : cryptoName),
                   type: req.passData.type,
-                  platform: crypto[configCoinMarketCap.correspondingAttribute.Platform].trim()
+                  platform: crypto[configCoinMarketCap.correspondingAttribute.Platform].trim(),
+                  source: configCoinMarketCap.source
                 }
               }
             };

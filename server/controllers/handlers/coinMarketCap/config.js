@@ -1,4 +1,5 @@
 module.exports = {
+  source: 'coin_market_cap',
   requiredHeaders: {
     coins: [
       '#',
