@@ -29,8 +29,10 @@ CREATE TABLE IF NOT EXISTS `crypto`.`crypto_info` (
   `attention` TINYINT(4) NULL DEFAULT NULL,
   `platform` VARCHAR(45) NULL DEFAULT NULL,
   `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'local db id. Auto increment',
-  PRIMARY KEY (`ID`),
-  UNIQUE INDEX `ID_UNIQUE` (`ID` ASC))
+  `crypto_id` VARCHAR(36) NOT NULL,
+  PRIMARY KEY (`ID`, `crypto_id`),
+  UNIQUE INDEX `ID_UNIQUE` (`ID` ASC),
+  UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 
