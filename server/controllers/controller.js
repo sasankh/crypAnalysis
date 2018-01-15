@@ -6,5 +6,6 @@ module.exports = {
   coinMarketCap_UpdateCryptoDataSource: require(`${__base}/server/controllers/handlers/coinMarketCap/handlers`).updateCryptoDataSourceHandler,
 
   //local
-  local_UpdateCryptoInfo: require(`${__base}/server/controllers/handlers/local/updateCryptoInfo`)
+  local_UpdateCryptoInfo: require(`${__base}/server/controllers/handlers/local/updateCryptoInfo`),
+  local_GetRequestStatus: require(`${__base}/server/controllers/handlers/local/getRequestStatus`)
 };
