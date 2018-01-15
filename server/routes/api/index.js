@@ -21,6 +21,7 @@ exports = module.exports = (app) => {
 
   //PUT
   app.put(apiRoutes.updateCryptoInfo, controller.local_UpdateCryptoInfo);
+  app.put(apiRoutes.updateCryptoDataSourceRecord, controller.local_UpdateCryptoDataSourceRecord);
 
   //DEL
 

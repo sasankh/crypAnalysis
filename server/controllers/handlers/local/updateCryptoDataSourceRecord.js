@@ -12,13 +12,13 @@ const {
 const configLocal = require(`${__base}/server/controllers/handlers/local/config`);
 
 module.exports = (req, res) => {
-  logger.request('updateCryptoInfo',req);
-  req.passData.handler = 'updateCryptoInfo';
+  logger.request('updateCryptoDataSourceRecord',req);
+  req.passData.handler = 'updateCryptoDataSourceRecord';
 
   utilCommonChecks.checkIfJsonRequest(req)
   .then(bodyValidation)
   .then(updateBodyValidation)
-  .then(updateCryptoInfoInDb)
+  .then(updateCryptoDataSourceRecordInDb)
   .then(responseBody)
   .then((data) => {
     response.success(req, data, res);
@@ -93,13 +93,9 @@ function updateBodyValidation(req) {
     logger.debug(fid,'invoked');
 
     const possibleAttributes = [
-      'name',
-      'description',
-      'platform',
-      'symbol',
-      'type',
+      'data_url',
       'attention',
-      'url'
+      'platform_crypto_symbol'
     ];
 
     const updateAttributes = Object.keys(req.passData.update);
@@ -109,29 +105,12 @@ function updateBodyValidation(req) {
     asyncLib.map(updateAttributes, (attribute, callback) => {
       if (possibleAttributes.indexOf(attribute) > -1) {
         switch (attribute) {
-          case 'name':
-          case 'description':
-          case 'platform':
-          case 'symbol':
+          case 'platform_crypto_symbol':
             if (typeof req.passData.update[attribute] === 'string') {
               validAttributeCount++;
               callback(null, true);
             } else {
               callback(`Update atttribute '${attribute}' is not string: ${req.body.update[attribute]}`);
-            }
-            break;
-
-          case 'type':
-            const allowedTypes = [
-              'coins',
-              'tokens'
-            ];
-
-            if (allowedTypes.indexOf(req.body.update.type) > -1) {
-              validAttributeCount++;
-              callback(null, true);
-            } else {
-              callback(`Update atttribute '${attribute}' is not an allowed type: ${req.body.update[attribute]}`);
             }
             break;
 
@@ -144,8 +123,8 @@ function updateBodyValidation(req) {
             }
             break;
 
-          case 'url':
-            if (validator.isURL(req.body.update.url)) {
+          case 'data_url':
+            if (validator.isURL(req.body.update.data_url)) {
               validAttributeCount++;
               callback(null, true);
             } else {
@@ -173,12 +152,12 @@ function updateBodyValidation(req) {
   });
 }
 
-function updateCryptoInfoInDb(req) {
+function updateCryptoDataSourceRecordInDb(req) {
   return new Promise((resolve, reject) => {
     const fid = {
       requestId: req.requestId,
       handler: req.passData.handler,
-      functionName: 'updateCryptoInfoInDb'
+      functionName: 'updateCryptoDataSourceRecordInDb'
     };
 
     logger.debug(fid,'invoked');
@@ -194,7 +173,7 @@ function updateCryptoInfoInDb(req) {
     });
 
     const updateQuery = {
-      query: `UPDATE crypto_info SET ${queryUpdateSet.join(', ')} WHERE crypto_id = ?`,
+      query: `UPDATE crypto_data_source SET ${queryUpdateSet.join(', ')} WHERE crypto_id = ?`,
       post: [
         req.passData.crypto_id
       ]

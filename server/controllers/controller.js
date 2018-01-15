@@ -7,5 +7,6 @@ module.exports = {
 
   //local
   local_UpdateCryptoInfo: require(`${__base}/server/controllers/handlers/local/updateCryptoInfo`),
+  local_UpdateCryptoDataSourceRecord: require(`${__base}/server/controllers/handlers/local/updateCryptoDataSourceRecord`),
   local_GetRequestStatus: require(`${__base}/server/controllers/handlers/local/getRequestStatus`)
 };

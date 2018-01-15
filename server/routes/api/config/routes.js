@@ -12,6 +12,7 @@ const ROUTES = {
 
   //PUT
   updateCryptoInfo: '/crypto/info/update',
+  updateCryptoDataSourceRecord: '/crypto/data_source/update',
 
   //PATCH
 
