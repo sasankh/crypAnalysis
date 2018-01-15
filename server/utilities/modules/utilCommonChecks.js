@@ -1,5 +1,7 @@
 'use strict';
 
+var urlExists = require('url-exists');
+
 const logger = require(__base + '/server/utilities/modules/logger');
 
 module.exports.checkIfJsonRequest = (req) => {
@@ -67,4 +69,20 @@ module.exports.isJSON = (object) => {
       return false;
     }
   }
+};
+
+module.exports.checkUrlExists = (url) => {
+  return new Promise( (resolve, reject) => {
+    try {
+      urlExists(url, (err, exists) => {
+        if (err) {
+          resolve(false);
+        } else {
+          resolve(exists);
+        }
+      });
+    } catch (e) {
+      resolve(false);
+    }
+  })
 };

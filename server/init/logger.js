@@ -2,7 +2,7 @@
 
 const log4js = require('log4js');
 const fs = require('fs');
-const async = require('async');
+const asyncLib = require('async');
 
 const config = require(__base + '/server/config/config');
 
@@ -46,7 +46,7 @@ let main ;
 let healthcheck ;
 let http ;
 
-async.map(logDirs, function(path, callback){
+asyncLib.map(logDirs, function(path, callback){
 
   try {
 

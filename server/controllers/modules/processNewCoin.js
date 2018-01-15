@@ -1,6 +1,6 @@
 'use strict';
 
-const async = require("async");
+const asyncLib = require("async");
 const uuidv5 = require('uuid/v5');
 
 const config = require(__base + '/server/config/config');
@@ -51,12 +51,13 @@ function validateRequiredAttributes(req) {
     const requiredAttributes = [
       'name',
       'symbol',
-      'type'
+      'type',
+      'source'
     ];
 
     const payloadAttributes = Object.keys(req.passData.payload);
 
-    async.map(requiredAttributes, (attribute, callback) => {
+    asyncLib.map(requiredAttributes, (attribute, callback) => {
       if (payloadAttributes.indexOf(attribute) > -1) {
         switch (attribute) {
           default:
@@ -86,25 +87,27 @@ function addCoinToDbIfNew(req) {
 
     logger.debug(fid,'invoked');
 
-    const uuidNameSpace = uuidv5(`${req.passData.payload.symbol}-${req.passData.payload.name}-${req.passData.payload.type}`, uuidv5.URL);
+    const uuidNameSpace = uuidv5(`${req.passData.payload.symbol}-${req.passData.payload.name}-${req.passData.payload.type}-${req.passData.payload.source}`, uuidv5.URL);
     const crypto_id = uuidv5(req.passData.payload.symbol, uuidNameSpace);
 
     const checkIfExistQuery = {
-      query: 'SELECT * FROM crypto_info WHERE symbol = ? AND crypto_id = ? LIMIT 1',
+      query: 'SELECT * FROM crypto_info WHERE symbol = ? AND crypto_id = ? AND source = ? LIMIT 1',
       post:[
         req.passData.payload.symbol,
-        crypto_id
+        crypto_id,
+        req.passData.payload.source
       ]
     };
 
     const insertQuery = {
-      query: 'INSERT INTO crypto_info (crypto_id, symbol, name, type, attention) VALUES (?, ?, ?, ?, ?)',
+      query: 'INSERT INTO crypto_info (crypto_id, symbol, name, type, attention, source) VALUES (?, ?, ?, ?, ?, ?)',
       post: [
         crypto_id,
         req.passData.payload.symbol,
         req.passData.payload.name,
         req.passData.payload.type,
-        (cryptoNameErrorChecker(req, req.passData.payload.symbol, req.passData.payload.name) ? 1 : 0)
+        (cryptoNameErrorChecker(req, req.passData.payload.symbol, req.passData.payload.name) ? 1 : 0),
+        req.passData.payload.source
       ]
     };
 

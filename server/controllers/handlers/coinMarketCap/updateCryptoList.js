@@ -1,6 +1,6 @@
 'use strict';
 
-const async = require("async");
+const asyncLib = require("async");
 const validator = require("validator");
 
 const config = require(__base + '/server/config/config');
@@ -13,6 +13,7 @@ const {
 } = require(__base + '/server/utilities/utils');
 
 const configCoinMarketCap = require(`${__base}/server/controllers/handlers/coinMarketCap/config`);
+const coin_market_cap_limiter = require(__base + '/server/init/limiter').coin_market_cap_limiter;
 
 const websiteScrape = require(__base + '/server/controllers/utilities/websiteScrape');
 const processNewCoin = require(__base + '/server/controllers/modules/processNewCoin');
@@ -90,17 +91,19 @@ function getCryptoTable(req) {
         reject({error: { code: 103, message: `Api for the supplied type not available ${req.passData.type}`, fid: fid, type: 'error', trace: null, defaultMessage:false }});
     }
 
-    websiteScrape.getTableFromHtml(req, url, (err, result) => {
-      if (err) {
-        reject({error: { code: 102, message: err, fid: fid, type: 'debug', trace: null, defaultMessage:false }});
-      } else {
-        if (result.length > 0) {
-          req.passData.cryptTable = result;
-          resolve(req);
+    coin_market_cap_limiter.removeTokens(1, () => {
+      websiteScrape.getTableFromHtml(req, url, (err, result) => {
+        if (err) {
+          reject({error: { code: 102, message: err, fid: fid, type: 'debug', trace: null, defaultMessage:false }});
         } else {
-          reject({error: { code: 102, message: "There is no table that could be retrieved", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
+          if (result.length > 0) {
+            req.passData.cryptTable = result;
+            resolve(req);
+          } else {
+            reject({error: { code: 102, message: "There is no table that could be retrieved", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
+          }
         }
-      }
+      });
     });
   });
 }
@@ -148,7 +151,7 @@ function identifyDesiredTables(req) {
 
     const desiredTables = [];
 
-    async.mapLimit(req.passData.cryptTable, 5, (cryptTable, callback) => {
+    asyncLib.mapLimit(req.passData.cryptTable, 5, (cryptTable, callback) => {
       if (cryptTable.constructor === Array && cryptTable.length > 0 && utilCommonChecks.isJSON(cryptTable[0]) && checkIfArrayAttributeCorrect(cryptTable[0])) {
         desiredTables.push(cryptTable);
         callback(null, true);
@@ -177,11 +180,11 @@ function processDesiredTable(req) {
 
     logger.debug(fid,'invoked');
 
-    async.mapLimit(req.passData.desiredTables, 5, (cryptTable, callback) => {
+    asyncLib.mapLimit(req.passData.desiredTables, 5, (cryptTable, callback) => {
       let addedList = [];
       let addErrorList = [];
 
-      async.mapLimit(cryptTable, 5, (crypto, callback2) => {
+      asyncLib.mapLimit(cryptTable, 5, (crypto, callback2) => {
         const cryptoName = crypto[configCoinMarketCap.correspondingAttribute.Name].trim();
 
         let miniReq = {};
@@ -199,7 +202,8 @@ function processDesiredTable(req) {
                 payload: {
                   symbol: cryptoSymbol,
                   name: (splitName.length === 2 ? splitName[1].trim() : cryptoName),
-                  type: req.passData.type
+                  type: req.passData.type,
+                  source: configCoinMarketCap.source
                 }
               }
             };
@@ -216,7 +220,8 @@ function processDesiredTable(req) {
                   symbol: cryptoSymbol,
                   name: (splitName.length === 2 ? splitName[1].trim() : cryptoName),
                   type: req.passData.type,
-                  platform: crypto[configCoinMarketCap.correspondingAttribute.Platform].trim()
+                  platform: crypto[configCoinMarketCap.correspondingAttribute.Platform].trim(),
+                  source: configCoinMarketCap.source
                 }
               }
             };

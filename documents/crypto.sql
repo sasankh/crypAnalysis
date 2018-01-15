@@ -18,6 +18,22 @@ CREATE SCHEMA IF NOT EXISTS `crypto` DEFAULT CHARACTER SET latin1 ;
 USE `crypto` ;
 
 -- -----------------------------------------------------
+-- Table `crypto`.`crypto_data_source`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `crypto`.`crypto_data_source` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `crypto_id` VARCHAR(36) NOT NULL,
+  `data_url` TEXT NULL DEFAULT NULL,
+  `attention` TINYINT(4) NULL DEFAULT NULL,
+  `platform_crypto_symbol` VARCHAR(126) NULL DEFAULT NULL,
+  `platform` VARCHAR(120) NOT NULL,
+  PRIMARY KEY (`ID`, `crypto_id`),
+  UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+
+-- -----------------------------------------------------
 -- Table `crypto`.`crypto_info`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `crypto`.`crypto_info` (
@@ -30,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `crypto`.`crypto_info` (
   `platform` VARCHAR(45) NULL DEFAULT NULL,
   `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'local db id. Auto increment',
   `crypto_id` VARCHAR(36) NOT NULL,
+  `source` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`ID`, `crypto_id`),
   UNIQUE INDEX `ID_UNIQUE` (`ID` ASC),
   UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
