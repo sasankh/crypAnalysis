@@ -13,6 +13,7 @@ const {
 } = require(__base + '/server/utilities/utils');
 
 const configCoinMarketCap = require(`${__base}/server/controllers/handlers/coinMarketCap/config`);
+const coin_market_cap_limiter = require(__base + '/server/init/limiter').coin_market_cap_limiter;
 
 const websiteScrape = require(__base + '/server/controllers/utilities/websiteScrape');
 const processNewCoin = require(__base + '/server/controllers/modules/processNewCoin');
@@ -90,17 +91,19 @@ function getCryptoTable(req) {
         reject({error: { code: 103, message: `Api for the supplied type not available ${req.passData.type}`, fid: fid, type: 'error', trace: null, defaultMessage:false }});
     }
 
-    websiteScrape.getTableFromHtml(req, url, (err, result) => {
-      if (err) {
-        reject({error: { code: 102, message: err, fid: fid, type: 'debug', trace: null, defaultMessage:false }});
-      } else {
-        if (result.length > 0) {
-          req.passData.cryptTable = result;
-          resolve(req);
+    coin_market_cap_limiter.removeTokens(1, () => {
+      websiteScrape.getTableFromHtml(req, url, (err, result) => {
+        if (err) {
+          reject({error: { code: 102, message: err, fid: fid, type: 'debug', trace: null, defaultMessage:false }});
         } else {
-          reject({error: { code: 102, message: "There is no table that could be retrieved", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
+          if (result.length > 0) {
+            req.passData.cryptTable = result;
+            resolve(req);
+          } else {
+            reject({error: { code: 102, message: "There is no table that could be retrieved", fid: fid, type: 'debug', trace: null, defaultMessage:false }});
+          }
         }
-      }
+      });
     });
   });
 }
