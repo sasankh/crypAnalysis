@@ -30,12 +30,24 @@ exports.apis = {
     api: {
       all_crypto: '/all/views/all/',
       all_coin: '/coins/views/all/',
-      all_token: '/tokens/views/all/'
+      all_token: '/tokens/views/all/',
+      individual_crypto: '/currencies/' //requires the crypto code in the parameters
     }
   }
 };
 
+exports.limiter = {
+  coin_market_cap_limiter: {
+    limit: process.env.COIN_MARKET_LIMITER_LIMIT || 9,
+    unit: process.env.COIN_MARKET_LIMITER_UNIT || 60000
+  }
+}
+
 exports.log = {
   log_level: process.env.MAIN_LOG_LEVEL,
   log_path: process.env.LOG_PATH
+};
+
+exports.memory = {
+  inprogress_request: []
 };

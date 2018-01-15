@@ -1,6 +1,6 @@
 'use strict';
 
-const async = require("async");
+const asyncLib = require("async");
 const uuidv5 = require('uuid/v5');
 
 const config = require(__base + '/server/config/config');
@@ -58,7 +58,7 @@ function validateRequiredAttributes(req) {
 
     const payloadAttributes = Object.keys(req.passData.payload);
 
-    async.map(requiredAttributes, (attribute, callback) => {
+    asyncLib.map(requiredAttributes, (attribute, callback) => {
       if (payloadAttributes.indexOf(attribute) > -1) {
         switch (attribute) {
           default:

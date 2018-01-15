@@ -49,6 +49,8 @@ require('./server/routes/index')(app);
 //initialize
 require(`${__base}/server/init/logger`);
 require(`${__base}/server/init/mysql`);
+//require(`${__base}/server/init/nedb`);  //not used
+require(`${__base}/server/init/limiter`);
 
 // start listening
 const server = app.listen(app.get('port'), () => {

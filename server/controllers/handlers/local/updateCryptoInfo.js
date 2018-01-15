@@ -1,6 +1,6 @@
 'use strict';
 const validator = require("validator");
-const async = require("async");
+const asyncLib = require("async");
 
 const {
   logger,
@@ -45,7 +45,7 @@ function bodyValidation(req) {
 
     const payloadAttributes = Object.keys(req.body);
 
-    async.map(requiredAttributes, (attribute, callback) => {
+    asyncLib.map(requiredAttributes, (attribute, callback) => {
       if (payloadAttributes.indexOf(attribute) > -1) {
         switch (attribute) {
           case 'crypto_id':
@@ -104,7 +104,7 @@ function updateBodyValidation(req) {
 
     const updateAttributes = Object.keys(req.passData.update);
 
-    async.map(updateAttributes, (attribute, callback) => {
+    asyncLib.map(updateAttributes, (attribute, callback) => {
       if (possibleAttributes.indexOf(attribute) > -1) {
         switch (attribute) {
           case 'name':

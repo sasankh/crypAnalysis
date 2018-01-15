@@ -1,6 +1,6 @@
 'use strict';
 
-const async = require("async");
+const asyncLib = require("async");
 const validator = require("validator");
 
 const config = require(__base + '/server/config/config');
@@ -148,7 +148,7 @@ function identifyDesiredTables(req) {
 
     const desiredTables = [];
 
-    async.mapLimit(req.passData.cryptTable, 5, (cryptTable, callback) => {
+    asyncLib.mapLimit(req.passData.cryptTable, 5, (cryptTable, callback) => {
       if (cryptTable.constructor === Array && cryptTable.length > 0 && utilCommonChecks.isJSON(cryptTable[0]) && checkIfArrayAttributeCorrect(cryptTable[0])) {
         desiredTables.push(cryptTable);
         callback(null, true);
@@ -177,11 +177,11 @@ function processDesiredTable(req) {
 
     logger.debug(fid,'invoked');
 
-    async.mapLimit(req.passData.desiredTables, 5, (cryptTable, callback) => {
+    asyncLib.mapLimit(req.passData.desiredTables, 5, (cryptTable, callback) => {
       let addedList = [];
       let addErrorList = [];
 
-      async.mapLimit(cryptTable, 5, (crypto, callback2) => {
+      asyncLib.mapLimit(cryptTable, 5, (crypto, callback2) => {
         const cryptoName = crypto[configCoinMarketCap.correspondingAttribute.Name].trim();
 
         let miniReq = {};
