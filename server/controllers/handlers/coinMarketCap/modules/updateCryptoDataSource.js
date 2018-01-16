@@ -126,7 +126,7 @@ function processCryptoUrl(req) {
       const data_url = `${config.apis.coin_market_cap.base_url}${config.apis.coin_market_cap.api.individual_crypto}${platform_crypto_symbol}`;
 
       coin_market_cap_limiter.removeTokens(1, async () => {
-        const exists = await utilCommonChecks.checkUrlExists(data_url);  //need to change limiter too
+        const exists = await utilCommonChecks.checkUrlExists(data_url);
 
         const insertQuery = {
           query: 'REPLACE INTO crypto_data_source (crypto_id, platform, platform_crypto_symbol, data_url, attention) VALUES (?, ?, ?, ?, ?)',

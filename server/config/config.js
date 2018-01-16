@@ -38,7 +38,7 @@ exports.apis = {
 
 exports.limiter = {
   coin_market_cap_limiter: {
-    limit: process.env.COIN_MARKET_LIMITER_LIMIT || 9,
+    limit: process.env.COIN_MARKET_LIMITER_LIMIT || 7,
     unit: process.env.COIN_MARKET_LIMITER_UNIT || 60000
   }
 }
