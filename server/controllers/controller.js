@@ -4,6 +4,7 @@ module.exports = {
   //coinMarketCap
   coinMarketCap_UpdateCryptoList: require(`${__base}/server/controllers/handlers/coinMarketCap/updateCryptoList`),
   coinMarketCap_UpdateCryptoDataSource: require(`${__base}/server/controllers/handlers/coinMarketCap/handlers`).updateCryptoDataSourceHandler,
+  coinMarketCap_ScrapAllHistoricalData: require(`${__base}/server/controllers/handlers/coinMarketCap/handlers`).coinMarketCap_ScrapAllHistoricalDataHandler,
 
   //local
   local_UpdateCryptoInfo: require(`${__base}/server/controllers/handlers/local/updateCryptoInfo`),

@@ -21,13 +21,12 @@ USE `crypto` ;
 -- Table `crypto`.`crypto_data_source`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `crypto`.`crypto_data_source` (
-  `ID` INT(11) NOT NULL AUTO_INCREMENT,
   `crypto_id` VARCHAR(36) NOT NULL,
-  `data_url` TEXT NULL DEFAULT NULL,
-  `attention` TINYINT(4) NULL DEFAULT NULL,
-  `platform_crypto_symbol` VARCHAR(126) NULL DEFAULT NULL,
+  `data_url` TEXT NOT NULL,
+  `attention` TINYINT(4) NOT NULL,
+  `platform_crypto_symbol` VARCHAR(126) NOT NULL,
   `platform` VARCHAR(120) NOT NULL,
-  PRIMARY KEY (`ID`, `crypto_id`),
+  PRIMARY KEY (`crypto_id`),
   UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
@@ -50,6 +49,29 @@ CREATE TABLE IF NOT EXISTS `crypto`.`crypto_info` (
   PRIMARY KEY (`ID`, `crypto_id`),
   UNIQUE INDEX `ID_UNIQUE` (`ID` ASC),
   UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+
+-- -----------------------------------------------------
+-- Table `crypto`.`historical_data`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `crypto`.`historical_data` (
+  `id` VARCHAR(36) NOT NULL,
+  `crypto_id` VARCHAR(36) NOT NULL,
+  `type` VARCHAR(45) NOT NULL,
+  `source` VARCHAR(120) NOT NULL,
+  `date` DATETIME NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `open` FLOAT NULL DEFAULT NULL,
+  `high` FLOAT NULL DEFAULT NULL,
+  `low` FLOAT NULL DEFAULT NULL,
+  `close` FLOAT NULL DEFAULT NULL,
+  `volume` FLOAT NULL DEFAULT NULL,
+  `market_cap` FLOAT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 

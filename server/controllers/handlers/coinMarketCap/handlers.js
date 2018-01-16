@@ -8,7 +8,7 @@ const {
 
 const config = require(__base + '/server/config/config');
 
-const updateCryptoDataSource = require(`${__base}/server/controllers/handlers/coinMarketCap/updateCryptoDataSource`);
+const multiSourceInvocation = require(`${__base}/server/controllers/handlers/coinMarketCap/independentHandlers/multiSourceInvocation`);
 
 module.exports.updateCryptoDataSourceHandler = (req, res) => {
   logger.request('updateCryptoDataSourceHandler', req);
@@ -21,33 +21,34 @@ module.exports.updateCryptoDataSourceHandler = (req, res) => {
     }
   };
 
-  updateCoinMarketCapDataSource(miniReq);
+  multiSourceInvocation.updateCoinMarketCapDataSource(miniReq);
 
   response.success(req, {
     in_progress: true,
+    action: 'Update_Crypto_Data_Source_Coin_Market_Cap',
     requestId: req.requestId
   }, res);
 
 };
 
-function updateCoinMarketCapDataSource (req) {
-  const fid = {
+module.exports.coinMarketCap_ScrapAllHistoricalDataHandler = (req, res) => {
+  logger.request('coinMarketCap_ScrapAllHistoricalDataHandler', req);
+  req.passData.handler = 'coinMarketCap_ScrapAllHistoricalDataHandler';
+
+  const miniReq = {
     requestId: req.requestId,
-    handler: req.passData.handler,
-    functionName: 'updateCoinMarketCapDataSource'
+    passData: {
+      handler: req.passData.handler,
+      passData: {}
+    }
   };
 
-  logger.debug(fid,'invoked');
+  multiSourceInvocation.scrapAllCoinMarketCapHistoricalData(miniReq);
 
-  utilMemory.inprogress_request(req, 'add', req.requestId);
+  response.success(req, {
+    in_progress: true,
+    type: 'Scrap_Historical_Data_Coin_Market_Cap',
+    requestId: req.requestId
+  }, res);
 
-  updateCryptoDataSource(req)
-  .then((data) => {
-    utilMemory.inprogress_request(req, 'remove', req.requestId);
-    logger.debug(fid,'UpdateCoinMarketCapDataSource Competed Successfully', data);
-  })
-  .catch((err) => {
-    utilMemory.inprogress_request(req, 'remove', req.requestId);
-    logger.log_reject(req, err);
-  });
-}
+};
