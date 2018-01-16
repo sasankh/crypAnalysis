@@ -30,5 +30,17 @@ module.exports = {
     Name: 'Name',
     Symbol: 'Symbol',
     Platform: 'Platform'
+  },
+  historicalData: {
+    startDate: '20100428',
+    requiredTableHeaders: [
+      'Date',
+      'Open',
+      'High',
+      'Low',
+      'Close',
+      'Volume',
+      'Market Cap'
+    ]
   }
 };

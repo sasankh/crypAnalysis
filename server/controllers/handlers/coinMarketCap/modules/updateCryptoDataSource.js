@@ -38,7 +38,6 @@ module.exports = (req) => {
     logger.debug(fid,'invoked');
 
     getAllCryptoList(req)
-    .then(getAllCryptoList)
     .then(processCryptoUrl)
     .then(responseBody)
     .then((data) => {

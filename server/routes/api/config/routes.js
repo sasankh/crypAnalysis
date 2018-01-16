@@ -8,7 +8,7 @@ const ROUTES = {
   home: '/',
   coinMarketCap_UpdateCryptoList: '/crypto/coin_market_cap/update/:type',
   coinMarketCap_UpdateCryptoDataSource: '/crypto/coin_market_cap/data_source/update_all',
-  coinMarketCap_GetHistoricalData: '/crypto/coin_market_cap/historical_data/:crypto_id',
+  coinMarketCap_ScrapAllHistoricalData: '/crypto/coin_market_cap/scrap_all_historical_data',
   getRequestStatus: '/crypto/request/status/:requestId',
 
   //PUT
