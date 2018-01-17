@@ -37,6 +37,7 @@ module.exports = (req, res) => {
     .then(identifyHistoricalDataTable)
     .then(processHistoricalDataTable)
     .then(insertHistoricalDataInDb)
+    .then(updateDailyHistoricalDataUpdateDateInCryptoDataSource)
     .then(responseBody)
     .then((data) => {
       resolve(data);
@@ -275,6 +276,36 @@ function insertHistoricalDataInDb(req) {
         }
       });
     });
+  });
+}
+
+function updateDailyHistoricalDataUpdateDateInCryptoDataSource(req) {
+  return new Promise((resolve, reject) => {
+    const fid = {
+      requestId: req.requestId,
+      handler: req.passData.handler,
+      functionName: 'updateDailyHistoricalDataUpdateDateInCryptoDataSource'
+    };
+
+    logger.debug(fid,'invoked');
+
+    const updateQuery = {
+      query: `Update crypto_data_source SET daily_historical_data_last_updated = ? WHERE crypto_id = ? AND platform = ?`,
+      post: [
+        moment.utc().format('YYYY-MM-DD HH:mm:ss'),
+        req.passData.crypto_id,
+        configCoinMarketCap.source
+      ]
+    };
+
+    utilMysql.queryMysql(req, 'db_crypto', updateQuery.query, updateQuery.post, (err, result) => {
+      if (err) {
+        reject({error: { code: 102, message: err, fid: fid, type: 'warn', trace: err, defaultMessage:false } });
+      } else {
+        resolve(req);
+      }
+    });
+
   });
 }
 
