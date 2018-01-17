@@ -1,6 +1,7 @@
 'use strict';
 
 const asyncLib = require("async");
+const moment = require("moment");
 
 const config = require(__base + '/server/config/config');
 
@@ -62,10 +63,11 @@ function getAllCryptoIdWithValidDataSource(req) {
     ];
 
     const getAllCryptoQuery = {
-      query: `SELECT ${getFields.join(', ')} FROM crypto_info as ci LEFT JOIN crypto_data_source as cds ON ci.crypto_id = cds.crypto_id WHERE ci.crypto_id IS NOT NULL AND cds.crypto_id IS NOT NULL AND cds.data_url IS NOT NULL AND ci.source = cds.platform AND cds.attention = ? AND cds.platform = ?`,
+      query: `SELECT ${getFields.join(', ')} FROM crypto_info as ci LEFT JOIN crypto_data_source as cds ON ci.crypto_id = cds.crypto_id WHERE ci.crypto_id IS NOT NULL AND cds.crypto_id IS NOT NULL AND cds.data_url IS NOT NULL AND ci.source = cds.platform AND cds.attention = ? AND cds.platform = ? AND ((cds.daily_historical_data_last_updated < ?) OR (cds.daily_historical_data_last_updated IS NULL))`,
       post: [
         0,
-        configCoinMarketCap.source
+        configCoinMarketCap.source,
+        `${moment.utc().format('YYYY-MM-DD')} 00:00:00`
       ]
     };
 
