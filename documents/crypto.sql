@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `crypto`.`crypto_data_source` (
   `attention` TINYINT(4) NOT NULL,
   `platform_crypto_symbol` VARCHAR(126) NOT NULL,
   `platform` VARCHAR(120) NOT NULL,
+  `daily_historical_data_last_updated` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`crypto_id`),
   UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
 ENGINE = InnoDB
@@ -50,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `crypto`.`crypto_info` (
   UNIQUE INDEX `ID_UNIQUE` (`ID` ASC),
   UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
 ENGINE = InnoDB
+AUTO_INCREMENT = 1434
 DEFAULT CHARACTER SET = latin1;
 
 
