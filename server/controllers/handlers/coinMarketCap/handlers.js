@@ -3,7 +3,7 @@
 const {
   logger,
   response,
-  utilMemory
+  utilCommonChecks
 } = require(__base + '/server/utilities/utils');
 
 const config = require(__base + '/server/config/config');
@@ -50,5 +50,34 @@ module.exports.coinMarketCap_ScrapAllHistoricalDataHandler = (req, res) => {
     type: 'Scrap_Historical_Data_Coin_Market_Cap',
     requestId: req.requestId
   }, res);
+
+};
+
+module.exports.coinMarketCap_GraphDataUpdate = (req, res) => {
+  logger.request('coinMarketCap_GraphDataUpdate', req);
+  req.passData.handler = 'coinMarketCap_GraphDataUpdate';
+
+  utilCommonChecks.checkIfJsonRequest(req)
+  .then(() => {
+    const miniReq = {
+      requestId: req.requestId,
+      passData: {
+        handler: req.passData.handler,
+        payload: req.body
+      }
+    };
+
+    multiSourceInvocation.getCoinMarketCapGraphData(miniReq);
+
+    response.success(req, {
+      in_progress: true,
+      type: 'Graph_Data_Update_Coin_Market_Cap',
+      requestId: req.requestId
+    }, res);
+
+  })
+  .catch((err) => {
+    response.failure(req, err, res);
+  })
 
 };

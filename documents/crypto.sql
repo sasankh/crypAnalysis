@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `crypto`.`crypto_data_source` (
   `platform_crypto_symbol` VARCHAR(126) NOT NULL,
   `platform` VARCHAR(120) NOT NULL,
   `daily_historical_data_last_updated` DATETIME NULL DEFAULT NULL,
+  `price_data_epoch_last_updated` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`crypto_id`),
   UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
 ENGINE = InnoDB
@@ -47,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `crypto`.`crypto_info` (
   `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'local db id. Auto increment',
   `crypto_id` VARCHAR(36) NOT NULL,
   `source` VARCHAR(64) NOT NULL,
+  `interest_group` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`ID`, `crypto_id`),
   UNIQUE INDEX `ID_UNIQUE` (`ID` ASC),
   UNIQUE INDEX `crypto_id_UNIQUE` (`crypto_id` ASC))
@@ -72,6 +74,58 @@ CREATE TABLE IF NOT EXISTS `crypto`.`historical_data` (
   `close` FLOAT NULL DEFAULT NULL,
   `volume` FLOAT NULL DEFAULT NULL,
   `market_cap` FLOAT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+
+-- -----------------------------------------------------
+-- Table `crypto`.`market_cap`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `crypto`.`market_cap` (
+  `id` VARCHAR(36) NOT NULL,
+  `crypto_id` VARCHAR(36) NOT NULL,
+  `source` VARCHAR(120) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `epoch_date` BIGINT(16) NOT NULL,
+  `market_cap` FLOAT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+
+-- -----------------------------------------------------
+-- Table `crypto`.`price_data_epoch`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `crypto`.`price_data_epoch` (
+  `id` VARCHAR(36) NOT NULL,
+  `crypto_id` VARCHAR(36) NOT NULL,
+  `source` VARCHAR(120) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `epoch_date` BIGINT(16) NOT NULL,
+  `price_usd` FLOAT NOT NULL,
+  `price_btc` FLOAT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+
+-- -----------------------------------------------------
+-- Table `crypto`.`volume_24hr`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `crypto`.`volume_24hr` (
+  `id` VARCHAR(36) NOT NULL,
+  `crypto_id` VARCHAR(36) NOT NULL,
+  `source` VARCHAR(120) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `epoch_date` BIGINT(16) NOT NULL,
+  `volume` BIGINT(16) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC))
 ENGINE = InnoDB

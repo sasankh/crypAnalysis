@@ -12,6 +12,7 @@ const controller = require(`${__base}/server/controllers/controller`);
 exports = module.exports = (app) => {
 
   //POST
+  app.post(apiRoutes.coinMarketCap_GraphDataUpdate, controller.coinMarketCap_GraphDataUpdate);
 
   //GET
   app.get(apiRoutes.home, controller.home);

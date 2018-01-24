@@ -18,7 +18,6 @@ module.exports.checkIfJsonRequest = (req) => {
     if(req.is('application/json') === false) {
       reject({ error: { code: 103, message: 'Incoming request (Content-Type) is not application/json.', fid: fid, type: 'warn', trace: null }});
     } else {
-
       try {
         resolve(req);
       } catch(e) {

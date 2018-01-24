@@ -3,6 +3,7 @@
 const ROUTES = {
 
   //POST
+  coinMarketCap_GraphDataUpdate: '/crypto/coin_market_cap/graph_data_update',
 
   //GET
   home: '/',
