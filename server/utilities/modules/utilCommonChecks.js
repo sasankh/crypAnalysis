@@ -70,6 +70,27 @@ module.exports.isJSON = (object) => {
   }
 };
 
+module.exports.isArray = (data) => {
+  if (typeof data === 'object' && data.constructor === 'Array') {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+module.exports.getJSON = (body) => {
+  try {
+    const parsedObject = JSON.parse(body);
+    return parsedObject;
+  } catch (e) {
+    if (typeof object === 'object' && object.constructor === Object && typeof object.constructor === 'function') {
+      return body;
+    } else {
+      return false;
+    }
+  }
+};
+
 module.exports.checkUrlExists = (url) => {
   return new Promise( (resolve, reject) => {
     try {

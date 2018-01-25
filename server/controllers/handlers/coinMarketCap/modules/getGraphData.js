@@ -12,7 +12,7 @@ const {
 
 const configCoinMarketCap = require(`${__base}/server/controllers/handlers/coinMarketCap/config`);
 
-const scrapIndividualHistoricalData = require(`${__base}/server/controllers/handlers/coinMarketCap/modules/scrapIndividualHistoricalData`);
+const getIndividualCryptoGraphData = require(`${__base}/server/controllers/handlers/coinMarketCap/modules/getIndividualCryptoGraphData`);
 
 /*
 //Required payload
@@ -70,7 +70,7 @@ function validatePayload(req) {
       ],
       range_type: [
         'all',
-        '2m'
+        '2d'
       ],
       direction: [
         'past',
@@ -144,7 +144,6 @@ function validatePayload(req) {
       if (err) {
         reject({error: { code: 103, message: err, fid: fid, type: 'debug', trace: null, defaultMessage:false } });
       } else {
-        console.log('$$$$$$@@@')
         resolve(req);
       }
     });
@@ -223,25 +222,21 @@ function initiateIndividualGraphDataRetrival(req) {
         }
       };
 
-      console.log(crypto_id, new Date());
+      const response = {
+        crypto_id,
+        error: true
+      }
 
-      callback(null, true);
-
-      // const response = {
-      //   crypto_id,
-      //   error: true
-      // }
-      //
-      // getIndividualGraphData(miniReq)
-      // .then((data) => {
-      //   response.error = false;
-      //   callback(null, response);
-      // })
-      // .catch((err) => {
-      //   logger.log_reject(miniReq, err);
-      //   response.message = (err && err.message ? err.message : 'Unknown Error. Check Logs')
-      //   callback(null, response);
-      // })
+      getIndividualCryptoGraphData(miniReq)
+      .then((data) => {
+        response.error = false;
+        callback(null, response);
+      })
+      .catch((err) => {
+        logger.log_reject(miniReq, err);
+        response.message = (err && err.message ? err.message : 'Unknown Error. Check Logs')
+        callback(null, response);
+      })
 
     }, (err, result) => {
       req.passData.graphRetrivalResult = result;
