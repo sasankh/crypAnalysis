@@ -27,6 +27,7 @@ exports.credentials = {
 exports.apis = {
   coin_market_cap: {
     base_url: 'https://coinmarketcap.com',
+    base_url_graph: 'https://graphs2.coinmarketcap.com',
     api: {
       all_crypto: '/all/views/all/',
       all_coin: '/coins/views/all/',

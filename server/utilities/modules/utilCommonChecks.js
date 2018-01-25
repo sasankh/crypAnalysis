@@ -18,7 +18,6 @@ module.exports.checkIfJsonRequest = (req) => {
     if(req.is('application/json') === false) {
       reject({ error: { code: 103, message: 'Incoming request (Content-Type) is not application/json.', fid: fid, type: 'warn', trace: null }});
     } else {
-
       try {
         resolve(req);
       } catch(e) {
@@ -65,6 +64,27 @@ module.exports.isJSON = (object) => {
   } catch (e) {
     if (typeof object === 'object' && object.constructor === Object && typeof object.constructor === 'function') {
       return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+module.exports.isArray = (data) => {
+  if (typeof data === 'object' && data.constructor === 'Array') {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+module.exports.getJSON = (body) => {
+  try {
+    const parsedObject = JSON.parse(body);
+    return parsedObject;
+  } catch (e) {
+    if (typeof object === 'object' && object.constructor === Object && typeof object.constructor === 'function') {
+      return body;
     } else {
       return false;
     }

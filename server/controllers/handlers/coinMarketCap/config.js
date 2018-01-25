@@ -42,5 +42,8 @@ module.exports = {
       'Volume',
       'Market Cap'
     ]
+  },
+  graphData: {
+    defaultPastEpochDate: 1483228800000
   }
 };
