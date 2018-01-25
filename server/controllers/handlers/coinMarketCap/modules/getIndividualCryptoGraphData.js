@@ -298,7 +298,7 @@ function initiateIndividualUrlRequest(req) {
       .catch((err) => {
         logger.log_reject(miniReq, err);
         response.message = (err && err.message ? err.message : 'Unknown Error. Check Logs')
-        callback(null, response);
+        callback(response.message, response);
       })
     }, (err, result) => {
       if (err) {
