@@ -180,8 +180,8 @@ function getCurrentRecordsDateRange(req) {
         reject({error: { code: 102, message: err, fid: fid, type: 'warn', trace: err, defaultMessage:false } });
       } else {
         if (result.length > 0) {
-          req.passData.oldestDate = result[0];
-          req.passData.newestDate = result[result.length - 1];
+          req.passData.oldestDate = result[0].epoch_date;
+          req.passData.newestDate = result[result.length - 1].epoch_date;
           resolve(req);
         }
         resolve(req);
