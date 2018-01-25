@@ -88,7 +88,7 @@ function validatePayload(req) {
               switch(req.passData.payload.type) {
                 case 'crypto_ids':
                 case 'interest_group':
-                  if (req.passData.payload[req.passData.payload.type]) {
+                  if (req.passData.payload[req.passData.payload.type] !== undefined && req.passData.payload[req.passData.payload.type] !== null) {
                     switch(req.passData.payload.type) {
                       case 'crypto_ids':
                         const crypto_ids = req.passData.payload.crypto_ids;
@@ -165,15 +165,28 @@ function getCryptoIdsIfInterestGroup(req) {
         'cds.crypto_id',
       ];
 
-      const getAllCryptoQuery = {
-        query: `SELECT ${getFields.join(', ')} FROM crypto_info as ci LEFT JOIN crypto_data_source as cds ON ci.crypto_id = cds.crypto_id WHERE ci.crypto_id IS NOT NULL AND cds.crypto_id IS NOT NULL AND cds.platform_crypto_symbol IS NOT NULL AND ci.source = cds.platform AND ci.attention = ? AND cds.attention = ? AND cds.platform = ? AND ci.interest_group = ?`,
-        post: [
-          0,
-          0,
-          configCoinMarketCap.source,
-          req.passData.payload.interest_group
-        ]
-      };
+      let getAllCryptoQuery = {};
+
+      if (req.passData.payload.interest_group === 0) {
+        getAllCryptoQuery = {
+          query: `SELECT ${getFields.join(', ')} FROM crypto_info as ci LEFT JOIN crypto_data_source as cds ON ci.crypto_id = cds.crypto_id WHERE ci.crypto_id IS NOT NULL AND cds.crypto_id IS NOT NULL AND cds.platform_crypto_symbol IS NOT NULL AND ci.source = cds.platform AND ci.attention = ? AND cds.attention = ? AND cds.platform = ?`,
+          post: [
+            0,
+            0,
+            configCoinMarketCap.source
+          ]
+        };
+      } else {
+        getAllCryptoQuery = {
+          query: `SELECT ${getFields.join(', ')} FROM crypto_info as ci LEFT JOIN crypto_data_source as cds ON ci.crypto_id = cds.crypto_id WHERE ci.crypto_id IS NOT NULL AND cds.crypto_id IS NOT NULL AND cds.platform_crypto_symbol IS NOT NULL AND ci.source = cds.platform AND ci.attention = ? AND cds.attention = ? AND cds.platform = ? AND ci.interest_group = ?`,
+          post: [
+            0,
+            0,
+            configCoinMarketCap.source,
+            req.passData.payload.interest_group
+          ]
+        };
+      }
 
       utilMysql.queryMysql(req, 'db_crypto', getAllCryptoQuery.query, getAllCryptoQuery.post, (err, result) => {
         if (err) {
@@ -211,7 +224,7 @@ function initiateIndividualGraphDataRetrival(req) {
 
     logger.debug(fid,'invoked');
 
-    asyncLib.mapSeries(req.passData.crypto_ids, (crypto_id, callback) => {
+    asyncLib.map(req.passData.crypto_ids, (crypto_id, callback) => {
       const miniReq = {
         requestId: `${fid.requestId}-${crypto_id}`,
         passData: {
