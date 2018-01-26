@@ -154,15 +154,15 @@ function processRetrievedData(req) {
     logger.debug(fid,'invoked');
 
     //get namespace function
-    const getNameSpace = (epoch_date, data_type, url) => {
-      return uuidv5(`${configCoinMarketCap.source}-${req.passData.range_type}-${data_type}-${epoch_date}-${url}`, uuidv5.URL);
+    const getNameSpace = (epoch_date) => {
+      return uuidv5(`${configCoinMarketCap.source}-${req.passData.range_type}-${epoch_date}`, uuidv5.URL);
     }
 
     //getPost
     const getPosts = (attribute) => {
       return req.passData.httpRespones[attribute].map((data) => {
         return [
-          uuidv5(req.passData.crypto_id, getNameSpace(data[0], attribute, req.passData.url)),
+          uuidv5(req.passData.crypto_id, getNameSpace(data[0])),
           req.passData.crypto_id,
           configCoinMarketCap.source,
           req.passData.range_type,
@@ -174,11 +174,11 @@ function processRetrievedData(req) {
 
     const queries = {
       price_usd: {
-        query: 'REPLACE INTO price_data_epoch (id, crypto_id, source, request_type, epoch_date, price_usd) VALUES ?',
+        query: 'INSERT INTO price_data_epoch (id, crypto_id, source, request_type, epoch_date, price_usd) VALUES ? ON DUPLICATE KEY UPDATE price_usd=VALUES(price_usd)',
         post: getPosts('price_usd')
       },
       price_btc: {
-        query: 'REPLACE INTO price_data_epoch (id, crypto_id, source, request_type, epoch_date, price_btc) VALUES ?',
+        query: 'INSERT INTO price_data_epoch (id, crypto_id, source, request_type, epoch_date, price_btc) VALUES ? ON DUPLICATE KEY UPDATE price_btc=VALUES(price_btc)',
         post: getPosts('price_btc')
       },
       volume_24hr: {
