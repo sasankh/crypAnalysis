@@ -300,7 +300,7 @@ function generateRequestUrl(req) {
         x -= two_day_difference;
       } while (x > fromDate);
 
-      urlList.push(`${url}/${fromDate}/${x}`);
+      urlList.push(`${url}/${fromDate}/${x + two_day_difference}`);
     }
 
     req.passData.urlList = urlList;
@@ -335,6 +335,8 @@ function initiateIndividualUrlRequest(req) {
         url,
         error: true
       }
+
+      callback(null, true);
 
       requestProcessGraphData(miniReq)
       .then((data) => {
