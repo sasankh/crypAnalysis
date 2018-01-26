@@ -44,6 +44,6 @@ module.exports = {
     ]
   },
   graphData: {
-    defaultPastEpochDate: 1483228800000
+    defaultPastEpochDate: process.env.COINMARKETCAP_DEFAULT_PAST_EPOCH_DATE || 1483228800000
   }
 };
