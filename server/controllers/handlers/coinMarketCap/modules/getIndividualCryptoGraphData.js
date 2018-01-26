@@ -336,8 +336,6 @@ function initiateIndividualUrlRequest(req) {
         error: true
       }
 
-      callback(null, true);
-
       requestProcessGraphData(miniReq)
       .then((data) => {
         response.error = false;
