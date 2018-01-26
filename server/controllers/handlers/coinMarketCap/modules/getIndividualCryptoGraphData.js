@@ -29,6 +29,7 @@ module.exports = (req, res) => {
     parameterValidation(req)
     .then(getCryptoInfo)
     .then(getCurrentRecordsDateRange)
+    .then(getCryptoOldestSourceRecordDate)
     .then(generateRequestUrl)
     .then(initiateIndividualUrlRequest)
     .then(responseBody)
@@ -182,7 +183,44 @@ function getCurrentRecordsDateRange(req) {
         if (result.length > 0) {
           req.passData.oldestDate = result[0].epoch_date;
           req.passData.newestDate = result[result.length - 1].epoch_date;
-          resolve(req);
+        }
+        resolve(req);
+      }
+    });
+
+  });
+}
+
+function getCryptoOldestSourceRecordDate(req) {
+  return new Promise((resolve, reject) => {
+    const fid = {
+      requestId: req.requestId,
+      handler: req.passData.handler,
+      functionName: 'getCryptoOldestSourceRecordDate'
+    };
+
+    logger.debug(fid,'invoked');
+
+    const getFields = [
+      'epoch_date'
+    ];
+
+    const cryptoOldestSourceRecordDateQuery = {
+      query: `SELECT ${getFields.join(', ')} FROM price_data_epoch where source = ? AND request_type = ? AND crypto_id = ? ORDER BY epoch_date ASC`,
+      post: [
+        configCoinMarketCap.source,
+        'all',
+        req.passData.crypto_id
+      ]
+    };
+
+
+    utilMysql.queryMysql(req, 'db_crypto', cryptoOldestSourceRecordDateQuery.query, cryptoOldestSourceRecordDateQuery.post, (err, result) => {
+      if (err) {
+        reject({error: { code: 102, message: err, fid: fid, type: 'warn', trace: err, defaultMessage:false } });
+      } else {
+        if (result.length > 0) {
+          req.passData.cryptoOldestSourceRecordDate = result[0].epoch_date;
         }
         resolve(req);
       }
@@ -213,7 +251,7 @@ function generateRequestUrl(req) {
       if (req.passData.oldestDate && req.passData.newestDate) {
         switch(req.passData.direction) {
           case 'past':
-            urlList.push(`${url}/${configCoinMarketCap.graphData.defaultPastEpochDate}/${req.passData.oldestDate}`);
+            urlList.push(url);
             break;
 
           case 'future':
@@ -233,7 +271,11 @@ function generateRequestUrl(req) {
       if (req.passData.oldestDate && req.passData.newestDate) {
         switch(req.passData.direction) {
           case 'past':
-            fromDate = configCoinMarketCap.graphData.defaultPastEpochDate;
+            if (req.passData.cryptoOldestSourceRecordDate && (req.passData.cryptoOldestSourceRecordDate > configCoinMarketCap.graphData.defaultPastEpochDate)) {
+              fromDate = req.passData.cryptoOldestSourceRecordDate;
+            } else {
+              fromDate = configCoinMarketCap.graphData.defaultPastEpochDate;
+            }
             toDate = req.passData.oldestDate;
             break;
 
@@ -243,7 +285,11 @@ function generateRequestUrl(req) {
             break;
         }
       } else {
-        fromDate = configCoinMarketCap.graphData.defaultPastEpochDate;
+        if (req.passData.cryptoOldestSourceRecordDate && (req.passData.cryptoOldestSourceRecordDate > configCoinMarketCap.graphData.defaultPastEpochDate)) {
+          fromDate = req.passData.cryptoOldestSourceRecordDate;
+        } else {
+          fromDate = configCoinMarketCap.graphData.defaultPastEpochDate;
+        }
         toDate = currentEpochTime;
       }
 
