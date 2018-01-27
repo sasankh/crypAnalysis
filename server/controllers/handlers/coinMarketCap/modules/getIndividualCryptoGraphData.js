@@ -371,6 +371,11 @@ function initiateIndividualUrlRequest(req) {
         error: true
       }
 
+      // console.log('######')
+      // console.log(url)
+      // console.log('######')
+      // callback(null, true)
+
       requestProcessGraphData(miniReq)
       .then((data) => {
         response.error = false;
