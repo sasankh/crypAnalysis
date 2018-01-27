@@ -30,6 +30,7 @@ module.exports = (req, res) => {
     .then(getCryptoInfo)
     .then(getCurrentRecordsDateRange)
     .then(getCryptoOldestSourceRecordDate)
+    .then(checkIfToProceedFor2d)
     .then(generateRequestUrl)
     .then(initiateIndividualUrlRequest)
     .then(responseBody)
@@ -229,6 +230,32 @@ function getCryptoOldestSourceRecordDate(req) {
   });
 }
 
+function checkIfToProceedFor2d(req) {
+  return new Promise((resolve, reject) => {
+    const fid = {
+      requestId: req.requestId,
+      handler: req.passData.handler,
+      functionName: 'checkIfToProceedFor2d'
+    };
+
+    logger.debug(fid,'invoked');
+
+    if (req.passData.range_type === '2d') {
+      if (req.passData.direction === 'past' && req.passData.oldestDate && req.passData.newestDate && (req.passData.oldestDate <= configCoinMarketCap.graphData.defaultPastEpochDate)) {
+        reject({error: { code: 103, message: 'Oldest date smaller then or equal to the default past date', fid: fid, type: 'debug', trace: {
+          oldestDate: req.passData.oldestDate,
+          newestDate: req.passData.newestDate,
+          defaultPastDate: configCoinMarketCap.graphData.defaultPastEpochDate,
+        }, defaultMessage:false } });
+      } else {
+        resolve(req);
+      }
+    } else {
+      resolve(req);
+    }
+  });
+}
+
 function generateRequestUrl(req) {
   return new Promise((resolve, reject) => {
     const fid = {
@@ -301,7 +328,15 @@ function generateRequestUrl(req) {
       } while (x > fromDate);
 
       urlList.push(`${url}/${fromDate}/${x + two_day_difference}`);
+
+      // console.log('fromDate', fromDate);
+      // console.log('toDate', toDate)
     }
+
+    // console.log('default', configCoinMarketCap.graphData.defaultPastEpochDate);
+    // console.log('cryptoOldestSourceRecordDate', req.passData.cryptoOldestSourceRecordDate);
+    // console.log('oldest', req.passData.oldestDate);
+    // console.log('newest', req.passData.newestDate)
 
     req.passData.urlList = urlList;
     resolve(req);

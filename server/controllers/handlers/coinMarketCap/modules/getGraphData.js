@@ -247,7 +247,14 @@ function initiateIndividualGraphDataRetrival(req) {
       })
       .catch((err) => {
         logger.log_reject(miniReq, err);
-        response.message = (err && err.message ? err.message : 'Unknown Error. Check Logs')
+        if (err && err.message) {
+          response.message = err.message;
+        } else if (err && err.error && err.error.message) {
+          response.message = err.error.message;
+        } else {
+          response.message = 'Unknown Error. Check log';
+        }
+
         callback(null, response);
       })
 
