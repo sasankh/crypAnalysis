@@ -224,7 +224,7 @@ function initiateIndividualGraphDataRetrival(req) {
 
     logger.debug(fid,'invoked');
 
-    asyncLib.map(req.passData.crypto_ids, (crypto_id, callback) => {
+    asyncLib.mapSeries(req.passData.crypto_ids, (crypto_id, callback) => {
       const miniReq = {
         requestId: `${fid.requestId}-${crypto_id}`,
         passData: {
