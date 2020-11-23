@@ -12,3 +12,4 @@ logs/*
 npm-debug.log
 credentials.js
 dump.rdb
+.idea
